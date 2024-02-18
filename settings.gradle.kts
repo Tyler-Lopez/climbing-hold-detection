@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Climbing Hold Detector"
+rootProject.name = "AppSearchGuide"
 include(":app")
