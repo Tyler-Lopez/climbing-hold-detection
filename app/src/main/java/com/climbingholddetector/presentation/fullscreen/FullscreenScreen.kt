@@ -1,31 +1,76 @@
 package com.climbingholddetector.presentation.fullscreen
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.climbingholddetector.R
+import kotlin.math.roundToInt
 
 @Composable
-fun FullscreenScreen(viewModel: FullscreenViewModel) {
-    BoxWithConstraints {
-        val containerWidthPx = LocalDensity.current.run { maxWidth.roundToPx() }
-        val containerHeightPx = LocalDensity.current.run { maxWidth.roundToPx() }
+fun FullscreenScreen(
+    viewModel: FullscreenViewModel
+) {
+    FullscreenScreenContent(
+        fullscreenScreenListener = viewModel,
+        offset = viewModel.offset.collectAsState().value, // todo lifecycle
+        scale = viewModel.scale.collectAsState().value, // todo lifecycle
+    )
+}
 
+@Composable
+fun FullscreenScreenContent(
+    fullscreenScreenListener: FullscreenScreenListener,
+    offset: Offset,
+    scale: Float,
+) {
+    BoxWithConstraints {
         val painter = painterResource(id = R.drawable.download)
 
+        val velocityTracker = VelocityTracker()
+        velocityTracker.calculateVelocity()
+        val density = LocalDensity.current
         Image(
             contentScale = ContentScale.Fit,
             painter = painter,
-            contentDescription = "",
+            contentDescription = null,
             modifier = Modifier
                 .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTransformGestures(
+                        panZoomLock = false,
+                        onGesture = fullscreenScreenListener::onGesture
+                    )
+                }
+                .graphicsLayer {
+                    translationX = offset.x
+                    translationY = offset.y
+                    scaleX = scale
+                    scaleY = scale
+                }
         )
+
+        LaunchedEffect(Unit) {
+            fullscreenScreenListener.onMeasured(
+                containerHeightPx = density.run { maxHeight.roundToPx() },
+                containerWidthPx = density.run { maxWidth.roundToPx() },
+                imageHeightPx = painter.intrinsicSize.height.roundToInt(),
+                imageWidthPx = painter.intrinsicSize.width.roundToInt()
+            )
+        }
     }
 
 
