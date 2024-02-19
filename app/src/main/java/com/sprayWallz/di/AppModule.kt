@@ -1,4 +1,4 @@
-package com.climbingholddetector.di
+package com.sprayWallz.di
 
 import dagger.Module
 import dagger.hilt.InstallIn

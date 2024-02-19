@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.climbingholddetector"
+    namespace = "com.sprayWallz"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.climbingholddetector"
+        applicationId = "com.sprayWallz"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

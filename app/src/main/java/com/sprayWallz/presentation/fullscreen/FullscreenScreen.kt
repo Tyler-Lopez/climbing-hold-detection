@@ -1,4 +1,4 @@
-package com.climbingholddetector.presentation.fullscreen
+package com.sprayWallz.presentation.fullscreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -16,9 +16,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import com.climbingholddetector.R
-import com.climbingholddetector.presentation.fullscreen.models.FullscreenGestureListener
-import com.climbingholddetector.presentation.fullscreen.models.FullscreenImageListener
+import com.sprayWallz.R
+import com.sprayWallz.presentation.fullscreen.models.FullscreenGestureListener
+import com.sprayWallz.presentation.fullscreen.models.FullscreenImageListener
 import kotlin.math.roundToInt
 
 @Composable

@@ -1,4 +1,4 @@
-package com.climbingholddetector
+package com.sprayWallz
 
 import org.junit.Test
 

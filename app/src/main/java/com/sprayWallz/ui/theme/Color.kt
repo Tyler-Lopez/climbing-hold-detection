@@ -1,4 +1,4 @@
-package com.climbingholddetector.ui.theme
+package com.sprayWallz.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

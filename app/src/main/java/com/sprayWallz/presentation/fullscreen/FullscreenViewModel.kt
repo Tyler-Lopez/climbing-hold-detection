@@ -1,4 +1,4 @@
-package com.climbingholddetector.presentation.fullscreen
+package com.sprayWallz.presentation.fullscreen
 
 
 import androidx.compose.animation.SplineBasedFloatDecayAnimationSpec
@@ -10,8 +10,8 @@ import androidx.compose.ui.unit.Density
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.climbingholddetector.presentation.fullscreen.models.FullscreenGestureListener
-import com.climbingholddetector.presentation.fullscreen.models.FullscreenImageListener
+import com.sprayWallz.presentation.fullscreen.models.FullscreenGestureListener
+import com.sprayWallz.presentation.fullscreen.models.FullscreenImageListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow

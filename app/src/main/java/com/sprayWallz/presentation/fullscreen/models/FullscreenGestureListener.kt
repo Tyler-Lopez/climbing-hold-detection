@@ -1,4 +1,4 @@
-package com.climbingholddetector.presentation.fullscreen.models
+package com.sprayWallz.presentation.fullscreen.models
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.Density
