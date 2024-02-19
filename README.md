@@ -1,6 +1,6 @@
-# Spray Wall
+# Spray Wallz
 
-Spray Wall is an Android application in development designed for climbing enthusiasts, enabling them to easily create and share bouldering routes from photos of spray walls.
+Spray Wallz is an Android application in development designed for climbing enthusiasts, enabling them to easily create and share bouldering routes from photos of spray walls.
 
 ## Features
 
