@@ -1,6 +1,7 @@
 package com.sprayWallz.presentation.fullscreen
 
 
+import androidx.annotation.Px
 import androidx.compose.animation.SplineBasedFloatDecayAnimationSpec
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.generateDecayAnimationSpec
@@ -37,6 +38,10 @@ class FullscreenViewModel @Inject constructor(
     private val offsetAnimatableX = Animatable(_offsetX.value)
     private val offsetAnimatableY = Animatable(_offsetY.value)
     private val velocityTracker = VelocityTracker()
+    private var containerHeightPx: Float = 0F
+    private var containerWidthPx: Float = 0F
+    private var imageHeightPx: Float = 0F
+    private var imageWidthPx: Float = 0F
     //endregion Private ViewModel Fields
 
     //region FullscreenGestureListener
@@ -67,27 +72,74 @@ class FullscreenViewModel @Inject constructor(
         zoomChange: Float,
         rotationChange: Float
     ) {
+        val newScale = (_scale.value * zoomChange).coerceIn(SCALE_MIN, SCALE_MAX)
+        val oldScale = _scale.value
+        _scale.value = newScale
+        if (oldScale != newScale) {
+            updateBounds()
+        }
+
         val newOffset = Offset(x = _offsetX.value, y = _offsetY.value) + panChange
-        _offsetX.value = newOffset.x
-        _offsetY.value = newOffset.y
+        _offsetX.value = newOffset.x.coerceIn(offsetAnimatableX.lowerBound, offsetAnimatableX.upperBound)
+        _offsetY.value = newOffset.y.coerceIn(offsetAnimatableY.lowerBound, offsetAnimatableY.upperBound)
 
         velocityTracker.addPosition(
             timeMillis = System.currentTimeMillis(),
             position = newOffset,
         )
-
-        _scale.value = (_scale.value * zoomChange).coerceIn(SCALE_MIN, SCALE_MAX)
     }
     //endregion FullscreenGestureListener
 
     //region FullscreenImageListener
     override fun onImageMeasured(containerHeightPx: Int, containerWidthPx: Int, imageHeightPx: Int, imageWidthPx: Int) {
-
+        this.containerHeightPx = containerHeightPx.toFloat()
+        this.containerWidthPx = containerWidthPx.toFloat()
+        this.imageHeightPx = imageHeightPx.toFloat()
+        this.imageWidthPx = imageWidthPx.toFloat()
+        updateBounds()
     }
     //endregion FullscreenImageListener
 
+    //region Utility Functions
+    private fun updateBounds() {
+        val ratioContainer = containerWidthPx / containerHeightPx
+        val ratioImage = imageWidthPx / imageHeightPx
+
+        if (ratioContainer.isNaN() || ratioImage.isNaN()) {
+            return
+        }
+
+        val scaledWidth: Float
+        val scaledHeight: Float
+
+        if (ratioContainer > ratioImage) {
+            scaledHeight = containerHeightPx
+            scaledWidth = scaledHeight * ratioImage
+        } else {
+            scaledWidth = containerWidthPx
+            scaledHeight = scaledWidth / ratioImage
+        }
+
+        val scaledImageWidth = scaledWidth * _scale.value
+        val excessImageWidthHalved = (scaledImageWidth - containerWidthPx) / 2F
+
+        offsetAnimatableX.updateBounds(
+            lowerBound = (excessImageWidthHalved * -1F).coerceAtMost(maximumValue = 0F),
+            upperBound = (excessImageWidthHalved * 1F).coerceAtLeast(minimumValue = 0F),
+        )
+
+        val scaledImageHeight = scaledHeight * _scale.value
+        val excessImageHeightHalved = (scaledImageHeight - containerHeightPx) / 2F
+
+        offsetAnimatableY.updateBounds(
+            lowerBound = (excessImageHeightHalved * -1F).coerceAtMost(maximumValue = 0F),
+            upperBound = (excessImageHeightHalved * 1F).coerceAtLeast(minimumValue = 0F),
+        )
+    }
+    //endregion Utility Functions
+
     companion object {
-        private const val OFFSET_INITIAL = 0F
+        @Px private const val OFFSET_INITIAL = 0F
         private const val SCALE_MIN = 1F
         private const val SCALE_MAX = 5F
     }
