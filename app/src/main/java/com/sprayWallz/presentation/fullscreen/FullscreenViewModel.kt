@@ -26,9 +26,13 @@ class FullscreenViewModel @Inject constructor(
 ) : ViewModel(), FullscreenGestureListener, FullscreenImageListener {
 
     //region Observable View State
+    private val _imageWidthPx = MutableStateFlow(value = 0F)
+    private val _imageHeightPx = MutableStateFlow(value = 0F)
     private val _offsetX = MutableStateFlow(value = OFFSET_INITIAL)
     private val _offsetY = MutableStateFlow(value = OFFSET_INITIAL)
     private val _scale = MutableStateFlow(value = SCALE_MIN)
+    val imageWidthPx: StateFlow<Float> = _imageWidthPx
+    val imageHeightPx: StateFlow<Float> = _imageHeightPx
     val offsetX: StateFlow<Float> = _offsetX
     val offsetY: StateFlow<Float> = _offsetY
     val scale: StateFlow<Float> = _scale
@@ -40,8 +44,8 @@ class FullscreenViewModel @Inject constructor(
     private val velocityTracker = VelocityTracker()
     private var containerHeightPx: Float = 0F
     private var containerWidthPx: Float = 0F
-    private var imageHeightPx: Float = 0F
-    private var imageWidthPx: Float = 0F
+   // private var imageHeightPx: Float = 0F
+  //  private var imageWidthPx: Float = 0F
     //endregion Private ViewModel Fields
 
     //region FullscreenGestureListener
@@ -61,8 +65,9 @@ class FullscreenViewModel @Inject constructor(
     }
 
     override fun onGesturesAnyStarted() {
-        viewModelScope.launch { offsetAnimatableX.stop() }
-        viewModelScope.launch { offsetAnimatableY.stop() }
+        println("any gesture started!")
+     //   viewModelScope.launch { offsetAnimatableX.stop() }
+      //  viewModelScope.launch { offsetAnimatableY.stop() }
         velocityTracker.resetTracking()
     }
 
@@ -94,33 +99,25 @@ class FullscreenViewModel @Inject constructor(
     override fun onImageMeasured(containerHeightPx: Int, containerWidthPx: Int, imageHeightPx: Int, imageWidthPx: Int) {
         this.containerHeightPx = containerHeightPx.toFloat()
         this.containerWidthPx = containerWidthPx.toFloat()
-        this.imageHeightPx = imageHeightPx.toFloat()
-        this.imageWidthPx = imageWidthPx.toFloat()
+
+        val ratioContainer = this.containerWidthPx / this.containerHeightPx
+        val ratioImage = imageWidthPx.toFloat() / imageHeightPx.toFloat()
+
+        if (ratioContainer > ratioImage) {
+            _imageHeightPx.value = this.containerHeightPx
+            _imageWidthPx.value = _imageHeightPx.value * ratioImage
+        } else {
+            _imageWidthPx.value = this.containerWidthPx
+            _imageHeightPx.value = _imageWidthPx.value / ratioImage
+        }
+
         updateBounds()
     }
     //endregion FullscreenImageListener
 
     //region Utility Functions
     private fun updateBounds() {
-        val ratioContainer = containerWidthPx / containerHeightPx
-        val ratioImage = imageWidthPx / imageHeightPx
-
-        if (ratioContainer.isNaN() || ratioImage.isNaN()) {
-            return
-        }
-
-        val scaledWidth: Float
-        val scaledHeight: Float
-
-        if (ratioContainer > ratioImage) {
-            scaledHeight = containerHeightPx
-            scaledWidth = scaledHeight * ratioImage
-        } else {
-            scaledWidth = containerWidthPx
-            scaledHeight = scaledWidth / ratioImage
-        }
-
-        val scaledImageWidth = scaledWidth * _scale.value
+        val scaledImageWidth = _imageWidthPx.value * _scale.value
         val excessImageWidthHalved = (scaledImageWidth - containerWidthPx) / 2F
 
         offsetAnimatableX.updateBounds(
@@ -128,7 +125,7 @@ class FullscreenViewModel @Inject constructor(
             upperBound = (excessImageWidthHalved * 1F).coerceAtLeast(minimumValue = 0F),
         )
 
-        val scaledImageHeight = scaledHeight * _scale.value
+        val scaledImageHeight = _imageHeightPx.value * _scale.value
         val excessImageHeightHalved = (scaledImageHeight - containerHeightPx) / 2F
 
         offsetAnimatableY.updateBounds(
