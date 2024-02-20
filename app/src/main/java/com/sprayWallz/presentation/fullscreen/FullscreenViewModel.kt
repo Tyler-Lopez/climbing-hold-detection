@@ -44,8 +44,6 @@ class FullscreenViewModel @Inject constructor(
     private val velocityTracker = VelocityTracker()
     private var containerHeightPx: Float = 0F
     private var containerWidthPx: Float = 0F
-   // private var imageHeightPx: Float = 0F
-  //  private var imageWidthPx: Float = 0F
     //endregion Private ViewModel Fields
 
     //region FullscreenGestureListener
