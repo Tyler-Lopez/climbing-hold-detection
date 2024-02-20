@@ -65,10 +65,11 @@ class FullscreenViewModel @Inject constructor(
     }
 
     override fun onGesturesAnyStarted() {
-        println("any gesture started!")
-     //   viewModelScope.launch { offsetAnimatableX.stop() }
-      //  viewModelScope.launch { offsetAnimatableY.stop() }
+        viewModelScope.launch { offsetAnimatableX.stop() }
+        viewModelScope.launch { offsetAnimatableY.stop() }
         velocityTracker.resetTracking()
+        val offset = Offset(x = _offsetX.value, y = _offsetY.value)
+        velocityTracker.addPosition(System.currentTimeMillis(), offset)
     }
 
     override fun onGestureTransformation(
